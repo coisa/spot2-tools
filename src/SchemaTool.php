@@ -3,6 +3,8 @@
 namespace CoiSA\Spot\Tool;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Event\SchemaAlterTableChangeColumnEventArgs;
+use Doctrine\DBAL\Events;
 use Spot\Locator;
 use Spot\Mapper;
 use Symfony\Component\Finder\Finder;
@@ -25,6 +27,8 @@ class SchemaTool
     public function __construct(Locator $locator)
     {
         $this->locator = $locator;
+
+        $this->getConnection()->getEventManager()->addEventListener(Events::onSchemaAlterTableChangeColumn, $this);
     }
 
     /**
@@ -148,6 +152,27 @@ class SchemaTool
         }
 
         return $queries;
+    }
+
+    /**
+     * Event listener responsible for ignore alter tables incorrectly marked as modified
+     *
+     * @param SchemaAlterTableChangeColumnEventArgs $eventArgs
+     */
+    public function onSchemaAlterTableChangeColumn(SchemaAlterTableChangeColumnEventArgs $eventArgs)
+    {
+        $columnDiff = $eventArgs->getColumnDiff();
+        $platform = $eventArgs->getPlatform();
+
+        $fromColumn = $columnDiff->fromColumn;
+        $fromColumnSql = $platform->getColumnDeclarationSQL($fromColumn->getQuotedName($platform), $fromColumn->toArray());
+
+        $toColumn = $columnDiff->column;
+        $toColumnSql = $platform->getColumnDeclarationSQL($toColumn->getQuotedName($platform), $toColumn->toArray());
+
+        if (str_replace('`', '', $fromColumnSql) === str_replace('`', '', $toColumnSql)) {
+            $eventArgs->preventDefault();
+        }
     }
 
     /**
