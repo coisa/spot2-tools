@@ -1,0 +1,34 @@
+{
+  "name": "coisa/spot2-tools",
+  "description": "Spot2 Console Utility Tools",
+  "type": "library",
+  "require": {
+    "php": "^7.1",
+    "vlucas/spot2": "^2.2",
+    "symfony/finder": "^4.0",
+    "symfony/console": "^4.0"
+  },
+  "license": "Apache-2.0",
+  "authors": [
+    {
+      "name": "Felipe Sayão Lobato Abreu",
+      "email": "contato@felipeabreu.com.br"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "CoiSA\\Spot\\Tool\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "CoiSA\\Spot\\Tool\\Test\\": "tests/"
+    }
+  },
+  "bin": ["bin/spot"],
+  "extra": {
+    "branch-alias": {
+      "dev-master": "1.0.x-dev"
+    }
+  }
+}

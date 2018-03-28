@@ -1,0 +1,18 @@
+version: "3"
+
+services:
+  spot2:
+    build: .
+    image: coisa/spot2-tools
+    hostname: spot2-tools
+    container_name: spot2-tools
+    env_file: .env
+    volumes:
+      - ./:/spot2
+    depends_on:
+      - mysql
+
+  mysql:
+    image: mysql/mysql-server:5.6
+    hostname: mysql
+    env_file: .env
