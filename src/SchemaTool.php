@@ -21,7 +21,6 @@ class SchemaTool
      * SchemaTool constructor.
      *
      * @param Locator $locator Spot Mapper Locator Connection Object
-     * @param string $path optional Where to start looking for entities
      */
     public function __construct(Locator $locator)
     {
