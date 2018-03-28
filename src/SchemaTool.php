@@ -232,7 +232,7 @@ class SchemaTool
         $finder->files()
             ->in(getcwd())
             ->name('/\.php$/')
-            ->exclude('/.*vendor\/.*/')
+            ->exclude('vendor')
             ->contains('Spot\\Entity');
 
         return $finder;
