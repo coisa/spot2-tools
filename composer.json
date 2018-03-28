@@ -25,7 +25,7 @@
       "CoiSA\\Spot\\Tool\\Test\\": "tests/"
     }
   },
-  "bin": ["bin/spot"],
+  "bin": ["bin/spot2"],
   "extra": {
     "branch-alias": {
       "dev-master": "1.0.x-dev"
