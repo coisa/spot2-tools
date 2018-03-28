@@ -1,6 +1,6 @@
 {
   "name": "coisa/spot2-tools",
-  "description": "Spot2 Console Utility Tools",
+  "description": "Spot2 ORM Console Utility Tools",
   "type": "library",
   "require": {
     "php": "^7.1",

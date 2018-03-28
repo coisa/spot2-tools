@@ -31,7 +31,7 @@ class SpotTools extends Application
             new Command\SchemaTool\DropCommand('schema-tool:drop'),
         ]);
 
-        parent::__construct('Spot Console Runner Tool');
+        parent::__construct('Spot2 ORM Console Runner Tool');
     }
 
     /**
