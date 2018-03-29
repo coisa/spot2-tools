@@ -51,7 +51,7 @@ class CreateCommand extends Command
             }
             $this->writeQueries($output, $schemaTool->getCreateSchemaSql());
         } else {
-            $schemaTool->createScrema($dropExists);
+            $schemaTool->createSchema($dropExists);
         }
     }
 

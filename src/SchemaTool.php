@@ -50,7 +50,7 @@ class SchemaTool
      *
      * @return bool
      */
-    public function createScrema($dropExists = true): bool
+    public function createSchema($dropExists = true): bool
     {
         $connection = $this->getConnection();
         $connection->beginTransaction();
@@ -180,15 +180,17 @@ class SchemaTool
     /**
      * Drops the database schema for tables found in entities files
      *
+     * @param bool $dropAllTables Set to true to drop even tables not present on current schema
+     *
      * @return bool
      */
-    public function dropSchema(): bool
+    public function dropSchema($dropAllTables = false): bool
     {
         $connection = $this->getConnection();
         $connection->beginTransaction();
 
         try {
-            foreach ($this->getDropSchemaSql() as $query) {
+            foreach ($this->getDropSchemaSql($dropAllTables) as $query) {
                 $connection->exec($query);
             }
             $connection->commit();
@@ -204,18 +206,27 @@ class SchemaTool
     /**
      * Returns the drop queries of tables found in entities files
      *
+     * @param bool $dropAllTables Set to true to get drop queries for tables not present on current schema
+     *
      * @return array
      */
-    public function getDropSchemaSql(): array
+    public function getDropSchemaSql($dropAllTables = false): array
     {
         $queries = [];
 
-        foreach ($this->getAllMappers() as $mapper) {
-            $table = $mapper->table();
-            $schemaManager = $mapper->connection()->getSchemaManager();
+        $schemaManager = $this->getConnection()->getSchemaManager();
 
-            if ($schemaManager->tablesExist([$table])) {
+        if ($dropAllTables) {
+            foreach ($schemaManager->listTableNames() as $table) {
                 $queries []= $schemaManager->getDatabasePlatform()->getDropTableSQL($table);
+            }
+        } else {
+            foreach ($this->getAllMappers() as $mapper) {
+                $table = $mapper->table();
+
+                if ($schemaManager->tablesExist([$table])) {
+                    $queries []= $schemaManager->getDatabasePlatform()->getDropTableSQL($table);
+                }
             }
         }
 
