@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CoiSA\Spot\Tool\Console\Command\SchemaTool;
 
 use CoiSA\Spot\Tool\Console\SpotTools;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CoiSA\Spot\Tool\Tests\Fixtures;
 
 use Spot\Entity;

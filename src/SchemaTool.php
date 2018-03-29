@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CoiSA\Spot\Tool;
 
 use Doctrine\DBAL\Connection;
