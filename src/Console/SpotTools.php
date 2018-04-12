@@ -50,23 +50,31 @@ class SpotTools extends Application
      */
     public function getEntityClassNames(): array
     {
-        $classNames = [];
+        $entities = [];
 
         foreach ($this->getEntityFiles() as $file) {
             include_once $file->getRealPath();
         }
 
-        foreach (get_declared_classes() as $className) {
+        foreach (\array_reverse(\get_declared_classes()) as $className) {
             if ($className === 'Spot\\Entity') {
                 continue;
             }
 
-            if (in_array('Spot\\EntityInterface', class_implements($className))) {
-                $classNames []= $className;
+            $class = new \ReflectionClass($className);
+
+            if (!$class->isUserDefined()) {
+                break;
             }
+
+            if (!$class->implementsInterface('Spot\\EntityInterface')) {
+                continue;
+            }
+
+            $entities []= $className;
         }
 
-        return $classNames;
+        return \array_reverse($entities);
     }
 
     /**
