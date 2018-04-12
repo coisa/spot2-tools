@@ -6,6 +6,7 @@ namespace CoiSA\Spot\Tool\Console\Command\SchemaTool;
 
 use CoiSA\Spot\Tool\Console\SpotTools;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Command\LockableTrait;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -19,6 +20,8 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class DropCommand extends Command
 {
+    use LockableTrait;
+
     /**
      * Configure command definition
      */
@@ -43,7 +46,9 @@ class DropCommand extends Command
         if ($input->hasOption('dump-sql')) {
             $this->writeQueries($output, $schemaTool->getDropSchemaSql());
         } else {
+            $this->lock();
             $schemaTool->dropSchema();
+            $this->release();
         }
     }
 

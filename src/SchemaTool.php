@@ -7,6 +7,7 @@ namespace CoiSA\Spot\Tool;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Event\SchemaAlterTableChangeColumnEventArgs;
 use Doctrine\DBAL\Events;
+use Doctrine\DBAL\Schema\Visitor\DropSchemaSqlCollector;
 use Spot\Locator;
 use Spot\Mapper;
 use Symfony\Component\Finder\Finder;
@@ -180,18 +181,16 @@ class SchemaTool
     /**
      * Drops the database schema for tables found in entities files
      *
-     * @param bool $dropAllTables Set to true to drop even tables not present on current schema
-     *
      * @return bool
      */
-    public function dropSchema($dropAllTables = false): bool
+    public function dropSchema(): bool
     {
         $connection = $this->getConnection();
         $connection->beginTransaction();
 
         try {
-            foreach ($this->getDropSchemaSql($dropAllTables) as $query) {
-                $connection->exec($query);
+            foreach ($this->getDropSchemaSql() as $query) {
+                $connection->executeQuery($query);
             }
             $connection->commit();
         } catch (\Exception $exception) {
@@ -206,31 +205,61 @@ class SchemaTool
     /**
      * Returns the drop queries of tables found in entities files
      *
-     * @param bool $dropAllTables Set to true to get drop queries for tables not present on current schema
-     *
      * @return array
      */
-    public function getDropSchemaSql($dropAllTables = false): array
+    public function getDropSchemaSql(): array
     {
         $queries = [];
 
         $schemaManager = $this->getConnection()->getSchemaManager();
 
-        if ($dropAllTables) {
-            foreach ($schemaManager->listTableNames() as $table) {
-                $queries []= $schemaManager->getDatabasePlatform()->getDropTableSQL($table);
-            }
-        } else {
-            foreach ($this->getAllMappers() as $mapper) {
-                $table = $mapper->table();
+        foreach ($this->getAllMappers() as $mapper) {
+            $table = $mapper->table();
 
-                if ($schemaManager->tablesExist([$table])) {
-                    $queries []= $schemaManager->getDatabasePlatform()->getDropTableSQL($table);
-                }
+            if ($schemaManager->tablesExist([$table])) {
+                $queries []= $schemaManager->getDatabasePlatform()->getDropTableSQL($table);
             }
         }
 
         return $queries;
+    }
+
+    /**
+     * Drops all elements in the database of the current connection.
+     */
+    public function dropDatabase()
+    {
+        $connection = $this->getConnection();
+        $connection->beginTransaction();
+
+        try {
+            foreach ($this->getDropDatabaseSQL() as $query) {
+                $connection->executeQuery($query);
+            }
+            $connection->commit();
+        } catch (\Exception $exception) {
+            $connection->rollBack();
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Gets the SQL needed to drop the database schema for the connections database.
+     *
+     * @return string[]
+     */
+    public function getDropDatabaseSQL()
+    {
+        $schemaManager = $this->getConnection()->getSchemaManager();
+        $schema = $schemaManager->createSchema();
+
+        $visitor = new DropSchemaSqlCollector($this->getConnection()->getDatabasePlatform());
+        $schema->visit($visitor);
+
+        return $visitor->getQueries();
     }
 
     /**

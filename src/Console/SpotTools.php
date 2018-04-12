@@ -7,6 +7,7 @@ namespace CoiSA\Spot\Tool\Console;
 use CoiSA\Spot\Tool\SchemaTool;
 use Spot\Locator;
 use Symfony\Component\Console\Application;
+use Symfony\Component\Finder\Finder;
 
 /**
  * Class SpotTools
@@ -42,5 +43,45 @@ class SpotTools extends Application
     public function getSchemaTool(): SchemaTool
     {
         return $this->schemaTool;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getEntityClassNames(): array
+    {
+        $classNames = [];
+
+        foreach ($this->getEntityFiles() as $file) {
+            include_once $file->getRealPath();
+        }
+
+        foreach (get_declared_classes() as $className) {
+            if ($className === 'Spot\\Entity') {
+                continue;
+            }
+
+            if (in_array('Spot\\EntityInterface', class_implements($className))) {
+                $classNames []= $className;
+            }
+        }
+
+        return $classNames;
+    }
+
+    /**
+     * @return \Iterator
+     */
+    private function getEntityFiles(): \Iterator
+    {
+        $finder = new Finder();
+
+        $finder->files()
+            ->in(getcwd())
+            ->name('/\.php$/')
+            ->exclude('vendor')
+            ->contains('Spot\\Entity');
+
+        return $finder->getIterator();
     }
 }

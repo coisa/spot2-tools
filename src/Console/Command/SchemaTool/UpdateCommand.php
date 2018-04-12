@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace CoiSA\Spot\Tool\Console\Command\SchemaTool;
 
 use CoiSA\Spot\Tool\Console\SpotTools;
-use function PHPSTORM_META\elementType;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Command\LockableTrait;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -20,6 +20,8 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class UpdateCommand extends Command
 {
+    use LockableTrait;
+
     /**
      * Configure command definition
      */
@@ -44,7 +46,9 @@ class UpdateCommand extends Command
         if ($input->hasOption('dump-sql')) {
             $this->writeQueries($output, $schemaTool->getUpdateSchemaSql());
         } else {
+            $this->lock();
             $schemaTool->updateSchema();
+            $this->release();
         }
     }
 
