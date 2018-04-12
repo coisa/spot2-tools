@@ -46,7 +46,8 @@ class SpotTools extends Application
     }
 
     /**
-     * @return string[]
+     * @return array
+     * @throws \ReflectionException
      */
     public function getEntityClassNames(): array
     {
