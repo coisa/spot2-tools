@@ -5,8 +5,8 @@
   "require": {
     "php": "^7.1",
     "vlucas/spot2": "^2.2",
-    "symfony/finder": "^4.0",
-    "symfony/console": "^4.0"
+    "symfony/finder": "^2|^3|^4.0",
+    "symfony/console": "^3.2|^4"
   },
   "license": "Apache-2.0",
   "authors": [
